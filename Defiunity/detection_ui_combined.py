@@ -126,7 +126,12 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load the segmentation model
 segmentation_model = DeepLabV3Plus(num_classes=9)
-segmentation_model.load_state_dict(torch.load(seg_model_path, map_location=device))
+try:
+    segmentation_model.load_state_dict(torch.load(seg_model_path, map_location=device))
+except Exception as e:
+    print(f"Error loading model: {e}")
+    raise
+
 segmentation_model.to(device)
 segmentation_model.eval()
 
