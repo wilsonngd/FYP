@@ -91,10 +91,34 @@ def save_as_pdf(image_name, prediction_result, model_choice, image_bytes, output
     except Exception as e:
         raise RuntimeError(f"Error generating PDF: {e}")
 
+model_urls = {
+    "dcganResNet_Model": "https://drive.google.com/uc?id=19VtuTM7b8d190xqFAdTO463uiVLM_Ih9&export=download",
+    "hyperbolicMSCNN_Model": "https://drive.google.com/uc?id=1QHDr7cQpy8uHYGAwAK-q_L9yeBKy6LWa&export=download",
+    "deepLabV3+_Model": "https://drive.google.com/uc?id=1KGBgWXNT6bZL5MHDrGq2p6uwXlLuNWbE&export=download",
+}
+
+def download_model(url, output_path):
+    if not os.path.exists(output_path):  # Avoid re-downloading if the file exists
+        response = requests.get(url, stream=True)
+        with open(output_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+        print(f"Downloaded {output_path}")
+    else:
+        print(f"{output_path} already exists. Skipping download.")
+
+segmentation_model = "deepLabV3+_Model"
+dcgan_ResNet_model = "dcganResNet_Model"
+hyperbolicMSCGNN_model = "hyperbolicMSCNN_Model"
+
 # Paths to model checkpoints
-seg_model_path = 'C:/Users/User/OneDrive/Documents/Wilson/TARUMT/Degree/Year3/fyp/model/segmentation_model.pth'
-dcgan_defect_model_path = 'C:/Users/User/OneDrive/Documents/Wilson/TARUMT/Degree/Year3/fyp/model/dcganResnet_discriminator_6b.pth'
-hyperbolic_defect_model_path = 'C:/Users/User/OneDrive/Documents/Wilson/TARUMT/Degree/Year3/fyp/model/hyperbolic_mscnn_gc(lr2)_.pth'
+seg_model_path = f"{segmentation_model}.pth"
+download_model(model_urls[segmentation_model], seg_model_path)
+dcgan_defect_model_path = f"{dcgan_ResNet_model}.pth"
+download_model(model_urls[dcgan_ResNet_model], dcgan_defect_model_path)
+hyperbolic_defect_model_path = f"{hyperbolicMSCGNN_model}.pth"
+download_model(model_urls[hyperbolicMSCGNN_model], hyperbolic_defect_model_path)
 
 # Initialize device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -146,7 +170,7 @@ def predict_defect_hyperbolic(image, model):
     return prediction
 
 # Streamlit UI
-st.image("C:/Users/User/Downloads/Banner.png")
+st.image("Defiunity/Banner.png")
 
 # Layout using columns
 col1, col2 = st.columns(2)
