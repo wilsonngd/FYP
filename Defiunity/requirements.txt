@@ -1,5 +1,6 @@
 torch
 torchvision
+torchviz
 scikit-learn
 matplotlib
 pycocotools
