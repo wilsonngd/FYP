@@ -116,6 +116,9 @@ hyperbolicMSCGNN_model = "hyperbolicMSCNN_Model"
 # Paths to model checkpoints
 seg_model_path = f"{segmentation_model}.pth"
 download_model(model_urls[segmentation_model], seg_model_path)
+with open(seg_model_path, 'rb') as f:
+    print(f.read(100))
+
 dcgan_defect_model_path = f"{dcgan_ResNet_model}.pth"
 download_model(model_urls[dcgan_ResNet_model], dcgan_defect_model_path)
 hyperbolic_defect_model_path = f"{hyperbolicMSCGNN_model}.pth"
