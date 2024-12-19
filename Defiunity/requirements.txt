@@ -9,4 +9,5 @@ imblearn
 streamlit
 hypll
 fpdf
+gdown
 opencv-python
