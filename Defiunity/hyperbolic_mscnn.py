@@ -146,19 +146,3 @@ class HyperbolicMSCNN(nn.Module):
         except Exception as e:
             print(f"Error during forward pass: {e}")
             raise e
-
-dummy_input = torch.randn(1, 3, 224, 224)
-from torchviz import make_dot
-
-# Instantiate the model and perform a forward pass
-model = HyperbolicMSCNN(input_channels=3, num_classes=2)
-tangents = TangentTensor(data=dummy_input, man_dim=1, manifold=manifold)
-manifold_inputs = manifold.expmap(tangents)
-output = model(manifold_inputs)
-
-# Create a visualization of the computational graph
-dot = make_dot(output.tensor, params=dict(model.named_parameters()))
-
-# Save the generated graph as a PNG file
-dot.format = 'png'
-dot.render('resnet18')
