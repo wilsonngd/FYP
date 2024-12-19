@@ -127,15 +127,21 @@ download_model_from_gdrive(dcgan_resnet_file_id, dcgan_defect_model_path)
 # Step 2: Verify the downloaded file
 verify_file(dcgan_defect_model_path)
 
+st.info("Done dcgan downloading")
+
 # Step 1: Download the model
 download_model_from_gdrive(hyperbolic_mscnn_file_id, hyperbolic_defect_model_path)
 # Step 2: Verify the downloaded file
 verify_file(hyperbolic_defect_model_path)
 
+st.info("Done mscnn downloading")
+
 # Step 1: Download the model
 download_model_from_gdrive(seg_file_id, seg_model_path)
 # Step 2: Verify the downloaded file
 verify_file(seg_model_path)
+
+st.info("Done segment downloading")
 
 # Initialize device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -145,6 +151,8 @@ segmentation_model = DeepLabV3Plus(num_classes=9)
 segmentation_model.load_state_dict(torch.load(seg_model_path, map_location=device))
 segmentation_model.to(device)
 segmentation_model.eval()
+
+st.info("Done segment loading")
 
 # Load DCGAN Discriminator
 dcgan_discriminator = DCGANTrainer.load_model(DCGANTrainer.Discriminator, model_path=dcgan_defect_model_path)
