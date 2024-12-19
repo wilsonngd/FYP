@@ -93,55 +93,29 @@ def save_as_pdf(image_name, prediction_result, model_choice, image_bytes, output
     except Exception as e:
         raise RuntimeError(f"Error generating PDF: {e}")
 
-# model_urls = {
-#     "dcganResNet_Model": "https://drive.google.com/uc?id=19VtuTM7b8d190xqFAdTO463uiVLM_Ih9&export=download",
-#     "hyperbolicMSCNN_Model": "https://drive.google.com/uc?id=1QHDr7cQpy8uHYGAwAK-q_L9yeBKy6LWa&export=download",
-#     "deepLabV3+_Model": "https://drive.google.com/uc?id=1KGBgWXNT6bZL5MHDrGq2p6uwXlLuNWbE&export=download",
-# }
-
-# Step 1: Download the file from Google Drive
 def download_model_from_gdrive(file_id, output_path):
-    url = f"https://drive.google.com/uc?id={file_id}"
-    print(f"Downloading model from: {url}")
-    gdown.download(url, output_path, quiet=False)
-    print("Download completed.")
+    if not os.path.exists(output_path):
+        url = f"https://drive.google.com/uc?id={file_id}"
+        print(f"Downloading model from: {url}")
+        gdown.download(url, output_path, quiet=False)
+        print("Download completed.")
+    else:
+        print(f"File already exists at {output_path}. Skipping download.")
 
-# Step 2: Verify the file exists and is correct
-def verify_file(file_path, expected_size=None):
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"File not found at path: {file_path}")
-    file_size = os.path.getsize(file_path)
-    print(f"Downloaded file size: {file_size} bytes")
-
-# Paths to model checkpoints
+# Step 1: Download the DCGAN ResNet model
 dcgan_resnet_file_id = "19VtuTM7b8d190xqFAdTO463uiVLM_Ih9"
-hyperbolic_mscnn_file_id = "1QHDr7cQpy8uHYGAwAK-q_L9yeBKy6LWa"
-seg_file_id = "1KGBgWXNT6bZL5MHDrGq2p6uwXlLuNWbE"
-
-seg_model_path = "segmentation_model.pth"
 dcgan_defect_model_path = "dcgan_ResNet_model.pth"
-hyperbolic_defect_model_path = "hyperbolicMSCNN_model.pth"
-
-# Step 1: Download the model
 download_model_from_gdrive(dcgan_resnet_file_id, dcgan_defect_model_path)
-# Step 2: Verify the downloaded file
-verify_file(dcgan_defect_model_path)
 
-st.info("Done dcgan downloading")
-
-# Step 1: Download the model
+# Step 2: Download the Hyperbolic MSCNN model
+hyperbolic_mscnn_file_id = "1QHDr7cQpy8uHYGAwAK-q_L9yeBKy6LWa"
+hyperbolic_defect_model_path = "hyperbolicMSCNN_model.pth"
 download_model_from_gdrive(hyperbolic_mscnn_file_id, hyperbolic_defect_model_path)
-# Step 2: Verify the downloaded file
-verify_file(hyperbolic_defect_model_path)
 
-st.info("Done mscnn downloading")
-
-# Step 1: Download the model
+# Step 3: Download the segmentation model
+seg_file_id = "1KGBgWXNT6bZL5MHDrGq2p6uwXlLuNWbE"
+seg_model_path = "segmentation_model.pth"
 download_model_from_gdrive(seg_file_id, seg_model_path)
-# Step 2: Verify the downloaded file
-verify_file(seg_model_path)
-
-st.info("Done segment downloading")
 
 # Initialize device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -151,8 +125,6 @@ segmentation_model = DeepLabV3Plus(num_classes=9)
 segmentation_model.load_state_dict(torch.load(seg_model_path, map_location=device))
 segmentation_model.to(device)
 segmentation_model.eval()
-
-st.info("Done segment loading")
 
 # Load DCGAN Discriminator
 dcgan_discriminator = DCGANTrainer.load_model(DCGANTrainer.Discriminator, model_path=dcgan_defect_model_path)
