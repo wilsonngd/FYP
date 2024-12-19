@@ -11,7 +11,6 @@ import time
 from io import BytesIO
 from fpdf import FPDF
 import os
-import requests
 import gdown
 
 def save_as_pdf(image_name, prediction_result, model_choice, image_bytes, output_pdf="report.pdf"):
