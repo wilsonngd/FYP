@@ -11,6 +11,7 @@ import time
 from io import BytesIO
 from fpdf import FPDF
 import os
+import requests
 
 def save_as_pdf(image_name, prediction_result, model_choice, image_bytes, output_pdf="report.pdf"):
     """
@@ -98,7 +99,7 @@ model_urls = {
 }
 
 def download_model(url, output_path):
-    if not os.path.exists(output_path):  # Avoid re-downloading if the file exists
+    if not os.path.exists(output_path):  # Avoid re-downloading if the file exist
         response = requests.get(url, stream=True)
         with open(output_path, 'wb') as f:
             for chunk in response.iter_content(chunk_size=1024):
