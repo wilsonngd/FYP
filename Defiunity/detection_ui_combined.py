@@ -12,6 +12,7 @@ from io import BytesIO
 from fpdf import FPDF
 import os
 import requests
+import gdown
 
 def save_as_pdf(image_name, prediction_result, model_choice, image_bytes, output_pdf="report.pdf"):
     """
@@ -92,49 +93,56 @@ def save_as_pdf(image_name, prediction_result, model_choice, image_bytes, output
     except Exception as e:
         raise RuntimeError(f"Error generating PDF: {e}")
 
-model_urls = {
-    "dcganResNet_Model": "https://drive.google.com/uc?id=19VtuTM7b8d190xqFAdTO463uiVLM_Ih9&export=download",
-    "hyperbolicMSCNN_Model": "https://drive.google.com/uc?id=1QHDr7cQpy8uHYGAwAK-q_L9yeBKy6LWa&export=download",
-    "deepLabV3+_Model": "https://drive.google.com/uc?id=1KGBgWXNT6bZL5MHDrGq2p6uwXlLuNWbE&export=download",
-}
+# model_urls = {
+#     "dcganResNet_Model": "https://drive.google.com/uc?id=19VtuTM7b8d190xqFAdTO463uiVLM_Ih9&export=download",
+#     "hyperbolicMSCNN_Model": "https://drive.google.com/uc?id=1QHDr7cQpy8uHYGAwAK-q_L9yeBKy6LWa&export=download",
+#     "deepLabV3+_Model": "https://drive.google.com/uc?id=1KGBgWXNT6bZL5MHDrGq2p6uwXlLuNWbE&export=download",
+# }
 
-def download_model(url, output_path):
-    if not os.path.exists(output_path):  # Avoid re-downloading if the file exist
-        response = requests.get(url, stream=True)
-        with open(output_path, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=1024):
-                if chunk:
-                    f.write(chunk)
-        print(f"Downloaded {output_path}")
-    else:
-        print(f"{output_path} already exists. Skipping download.")
+# Step 1: Download the file from Google Drive
+def download_model_from_gdrive(file_id, output_path):
+    url = f"https://drive.google.com/uc?id={file_id}"
+    print(f"Downloading model from: {url}")
+    gdown.download(url, output_path, quiet=False)
+    print("Download completed.")
 
-segmentation_model = "deepLabV3+_Model"
-dcgan_ResNet_model = "dcganResNet_Model"
-hyperbolicMSCGNN_model = "hyperbolicMSCNN_Model"
+# Step 2: Verify the file exists and is correct
+def verify_file(file_path, expected_size=None):
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"File not found at path: {file_path}")
+    file_size = os.path.getsize(file_path)
+    print(f"Downloaded file size: {file_size} bytes")
 
 # Paths to model checkpoints
-seg_model_path = f"{segmentation_model}.pth"
-download_model(model_urls[segmentation_model], seg_model_path)
-with open(seg_model_path, 'rb') as f:
-    print(f.read(100))
+dcgan_resnet_file_id = "19VtuTM7b8d190xqFAdTO463uiVLM_Ih9"
+hyperbolic_mscnn_file_id = "1QHDr7cQpy8uHYGAwAK-q_L9yeBKy6LWa"
+seg_file_id = "1KGBgWXNT6bZL5MHDrGq2p6uwXlLuNWbE"
 
-dcgan_defect_model_path = f"{dcgan_ResNet_model}.pth"
-download_model(model_urls[dcgan_ResNet_model], dcgan_defect_model_path)
-hyperbolic_defect_model_path = f"{hyperbolicMSCGNN_model}.pth"
-download_model(model_urls[hyperbolicMSCGNN_model], hyperbolic_defect_model_path)
+seg_model_path = "segmentation_model.pth"
+dcgan_defect_model_path = "dcgan_ResNet_model.pth"
+hyperbolic_defect_model_path = "hyperbolicMSCNN_model.pth"
+
+# Step 1: Download the model
+download_model_from_gdrive(dcgan_resnet_file_id, dcgan_defect_model_path)
+# Step 2: Verify the downloaded file
+verify_file(dcgan_defect_model_path)
+
+# Step 1: Download the model
+download_model_from_gdrive(hyperbolic_mscnn_file_id, hyperbolic_defect_model_path)
+# Step 2: Verify the downloaded file
+verify_file(hyperbolic_defect_model_path)
+
+# Step 1: Download the model
+download_model_from_gdrive(seg_file_id, seg_model_path)
+# Step 2: Verify the downloaded file
+verify_file(seg_model_path)
 
 # Initialize device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load the segmentation model
 segmentation_model = DeepLabV3Plus(num_classes=9)
-try:
-    segmentation_model.load_state_dict(torch.load(seg_model_path, map_location=device))
-except Exception as e:
-    print(f"Error loading model: {e}")
-    raise
-
+segmentation_model.load_state_dict(torch.load(seg_model_path, map_location=device))
 segmentation_model.to(device)
 segmentation_model.eval()
 
