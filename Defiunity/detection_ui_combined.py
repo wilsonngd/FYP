@@ -12,10 +12,6 @@ from io import BytesIO
 from fpdf import FPDF
 import os
 import gdown
-from pathlib import Path
-
-cache_dir = Path("/home/appuser/.cache/defect_detection/")
-cache_dir.mkdir(parents=True, exist_ok=True)
 
 def save_as_pdf(image_name, prediction_result, model_choice, image_bytes, output_pdf="report.pdf"):
     """
@@ -95,7 +91,7 @@ def save_as_pdf(image_name, prediction_result, model_choice, image_bytes, output
 
     except Exception as e:
         raise RuntimeError(f"Error generating PDF: {e}")
-
+        
 def download_model_from_gdrive(file_id, output_path):
     if not os.path.exists(output_path):
         url = f"https://drive.google.com/uc?id={file_id}"
@@ -107,17 +103,17 @@ def download_model_from_gdrive(file_id, output_path):
 
 # Step 1: Download the DCGAN ResNet model
 dcgan_resnet_file_id = "19VtuTM7b8d190xqFAdTO463uiVLM_Ih9"
-dcgan_defect_model_path = cache_dir / "dcgan_ResNet_model.pth"
+dcgan_defect_model_path = "dcgan_ResNet_model.pth"
 download_model_from_gdrive(dcgan_resnet_file_id, dcgan_defect_model_path)
 
 # Step 2: Download the Hyperbolic MSCNN model
 hyperbolic_mscnn_file_id = "1QHDr7cQpy8uHYGAwAK-q_L9yeBKy6LWa"
-hyperbolic_defect_model_path = cache_dir / "hyperbolicMSCNN_model.pth"
+hyperbolic_defect_model_path = "hyperbolicMSCNN_model.pth"
 download_model_from_gdrive(hyperbolic_mscnn_file_id, hyperbolic_defect_model_path)
 
 # Step 3: Download the segmentation model
 seg_file_id = "1KGBgWXNT6bZL5MHDrGq2p6uwXlLuNWbE"
-seg_model_path = cache_dir / "segmentation_model.pth"
+seg_model_path = "segmentation_model.pth"
 download_model_from_gdrive(seg_file_id, seg_model_path)
 
 # Initialize device
