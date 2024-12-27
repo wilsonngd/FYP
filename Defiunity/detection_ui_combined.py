@@ -14,7 +14,7 @@ import os
 import gdown
 from pathlib import Path
 
-cache_dir = Path.home() / ".cache" / "defect_detection"
+cache_dir = Path("/home/appuser/.cache/defect_detection/")
 cache_dir.mkdir(parents=True, exist_ok=True)
 
 def save_as_pdf(image_name, prediction_result, model_choice, image_bytes, output_pdf="report.pdf"):
