@@ -222,7 +222,6 @@ class DCGANTrainer:
 
                 # Combine losses with weights
                 d_loss = alpha * ((real_loss + fake_loss) / 2) + beta * defectiveness_loss
-                # d_loss = (real_loss + fake_loss) / 2 + defectiveness_loss
 
                 d_loss.backward()
                 self.optimizer_D.step()
