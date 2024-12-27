@@ -31,8 +31,6 @@ if __name__ == "__main__":
     print(f"Training started at: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
     dcgan.train(validation_path, val_ann_file_path)
     dcgan.plot_losses()
-    dcgan.plot_acc_scores()
-    dcgan.plot_f1_scores()
     
     # Evaluate the discriminator
     accuracy, precision, recall, f1 = dcgan.evaluate_discriminator(test_path, test_ann_file_path)
